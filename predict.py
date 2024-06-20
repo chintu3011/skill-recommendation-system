@@ -1,4 +1,5 @@
 import pickle
+import ast
 from fastapi import FastAPI
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -10,6 +11,7 @@ tfidf=TfidfVectorizer(tokenizer=lambda x: x.split(' '))
 with open('dataFrame.pkl','rb') as d:
     df=pickle.load(d)
 
+# print(df.columns)
 # loading cosing matrix
 with open('cosineMatrix.pkl','rb') as c:
     cosine=pickle.load(c)
@@ -38,7 +40,8 @@ async def home():
 @app.post('/predict/')
 async def predict(skills:str='developer',quantity:int=5):
     profiles = recommend_profiles(skills,top_n=quantity)
-    profiles=profiles[['Full Name','Company Name','School Name','URL','Skills']]
+    profiles=profiles[['Full Name','Company Name','School Name','URL','Headline','Skills']]
+    profiles['Headline']=profiles['Headline'].apply(lambda x:ast.literal_eval(x))
     profiles=profiles.to_dict(orient='records')
     updated_profiles = [
     {**item, 'Status': 'Fresher' if not item['Company Name'] else 'Experienced'}
