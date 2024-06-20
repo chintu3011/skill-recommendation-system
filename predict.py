@@ -11,12 +11,12 @@ tfidf=TfidfVectorizer(tokenizer=lambda x: x.split(' '))
 with open('dataFrame.pkl','rb') as d:
     df=pickle.load(d)
 
-# print(df.columns)
+print(df.columns)
 # loading cosing matrix
 with open('cosineMatrix.pkl','rb') as c:
     cosine=pickle.load(c)
 
-tfidf_matrix = tfidf.fit_transform(df['Skills'])
+tfidf_matrix = tfidf.fit_transform(df['Text'])
 def recommend_profiles(skills, df=df, tfidf=tfidf, cosine_sim=cosine, top_n=5):
     # Preprocess the input skills
     skills = skills.lower()
@@ -40,7 +40,7 @@ async def home():
 @app.post('/predict/')
 async def predict(skills:str='developer',quantity:int=5):
     profiles = recommend_profiles(skills,top_n=quantity)
-    profiles=profiles[['Full Name','Company Name','School Name','URL','Headline','Skills']]
+    profiles=profiles[['Full Name','Company Name','School Name','URL','Headline','Skills','Text']]
     profiles['Headline']=profiles['Headline'].apply(lambda x:ast.literal_eval(x))
     profiles['Headline']=profiles['Headline'].apply(lambda x:' '.join(x))
     profiles=profiles.to_dict(orient='records')
