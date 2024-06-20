@@ -31,7 +31,7 @@ def recommend_profiles(skills, df=df, tfidf=tfidf, cosine_sim=cosine, top_n=5):
 
     return recommended_profiles
 
-# print(df)
+print(df.columns)
 
 @app.get('/')
 async def home():
@@ -42,6 +42,7 @@ async def predict(skills:str='developer',quantity:int=5):
     profiles = recommend_profiles(skills,top_n=quantity)
     profiles=profiles[['Full Name','Company Name','School Name','URL','Headline','Skills']]
     profiles['Headline']=profiles['Headline'].apply(lambda x:ast.literal_eval(x))
+    profiles['Headline']=profiles['Headline'].apply(lambda x:' '.join(x))
     profiles=profiles.to_dict(orient='records')
     updated_profiles = [
     {**item, 'Status': 'Fresher' if not item['Company Name'] else 'Experienced'}
